@@ -1,0 +1,47 @@
+Sub comparebatch()
+'
+' comparebatch Macro
+'
+'
+Dim fldrVersion1 As String, fldrVersion2 As String
+Dim strVersion1 As String, strVersion2 As String
+Dim docVersion1 As Document, docVersion2 As Document
+Dim docCompareTarget As Document
+Dim fd As FileDialog
+Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+With fd
+    .Title = "Select the folder that contains the original files."
+    If .Show = -1 Then
+        fldrVersion1 = .SelectedItems(1)
+    Else
+        MsgBox "You did not select a folder."
+        Exit Sub
+    End If
+End With
+With fd
+    .Title = "Select the folder that contains the revised files."
+    If .Show = -1 Then
+        fldrVersion2 = .SelectedItems(1)
+    Else
+        MsgBox "You did not select a folder."
+        Exit Sub
+    End If
+End With
+For i = 1 To 2
+    fldrVersion1 = fldrVersion1 & "\Folder" & i & "\"
+    fldrVersion2 = fldrVersion2 & "\Folder" & i & "\"
+    MkDir fldrVersion1 & "\Compared"
+    strVersion1 = Dir$(fldrVersion1 & "*.docx*")
+    While strVersion1 <> ""
+        Set docVersion1 = Documents.Open(strfldrVersion1 & strVersion1)
+        Set docVersion2 = Documents.Open(strfldrVersion1 & docVersion1.Name)
+        docVersion1.Compare Name:=docVersion2, compareTarget:=wdCompareTargetNew
+        ActiveDocument.SaveAs2 fldrVersion1 & "Compared\" & docVersion1.Name
+        ActiveDocument.Close
+        docVersion1.Close wdDoNotSaveChanges
+        docVersion2.Close wdDoNotSaveChanges
+        strVersion1 = Dir$()
+    Wend
+Next i
+
+End Sub
